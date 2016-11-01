@@ -3,6 +3,7 @@ const fs = require('fs');
 const webpack = require('webpack');
 const {expect} = require('chai');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BlessCSSWebpackPlugin = require('./../src/plugin');
 
 const readFile = path => {
@@ -93,6 +94,43 @@ it('should compile SASS, then chunk it into multiple files', done => {
         expect(stats.toJson().assets[2].name).to.equal('main-blessed1.css');
         expect(stats.compilation.assets['main.css'].source()).to.equal(main1);
         expect(stats.compilation.assets['main-blessed1.css'].source()).to.equal(main2);
+        done();
+      }
+
+    });
+  }).catch(done);
+
+});
+
+it('should support the html webpack plugin', done => {
+
+  readFile(__dirname + '/fixtures/expected/index.html').then(index => {
+    const extractCSS = new ExtractTextPlugin('[name].css');
+
+    const webpackConfig = {
+      entry: __dirname + '/fixtures/css/entry.js',
+      output: {
+        path: os.tmpdir() + '/output',
+      },
+      module: {
+        loaders: [{
+          test: /\.css$/,
+          loader: extractCSS.extract(['css-loader'])
+        }]
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        new BlessCSSWebpackPlugin(),
+        extractCSS
+      ]
+    };
+
+    webpack(webpackConfig, (err, stats) => {
+
+      if (err) {
+        done(err);
+      } else {
+        expect(stats.compilation.assets['index.html'].source()).to.equal(index);
         done();
       }
 

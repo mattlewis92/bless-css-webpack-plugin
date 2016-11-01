@@ -6,34 +6,46 @@ class BlessCSSWebpackPlugin {
 
   apply(compiler) {
 
-    compiler.plugin('emit', (compilation, callback) => {
+    compiler.plugin('this-compilation', (compilation) => {
 
-      Object.keys(compilation.assets)
-        .filter(filename => filename.match(CSS_REGEXP))
-        .map(cssFileName => {
-          const parsedData = bless.chunk(compilation.assets[cssFileName].source(), {source: cssFileName});
-          if (parsedData.data.length > 1) {
-            const filenameWithoutExtension = cssFileName.replace(CSS_REGEXP, '');
+      compilation.plugin('optimize-assets', (assets, callback) => {
 
-            parsedData.data.forEach((file, index) => {
+        compilation.chunks.forEach(chunk => {
+          chunk.files
+            .filter(filename => filename.match(CSS_REGEXP))
+            .forEach(cssFileName => {
 
-              const filename = index === 0 ? cssFileName : `${filenameWithoutExtension}-blessed${index}.css`;
+              const parsedData = bless.chunk(assets[cssFileName].source(), {source: cssFileName});
+              if (parsedData.data.length > 1) {
+                const filenameWithoutExtension = cssFileName.replace(CSS_REGEXP, '');
 
-              compilation.assets[filename] = {
-                source() {
-                  return file;
-                },
-                size() {
-                  return file.length;
-                }
-              };
+                parsedData.data.forEach((file, index) => {
+
+                  const filename = index === 0 ? cssFileName : `${filenameWithoutExtension}-blessed${index}.css`;
+
+                  assets[filename] = {
+                    source() {
+                      return file;
+                    },
+                    size() {
+                      return file.length;
+                    }
+                  };
+
+                  if (index > 0) {
+                    chunk.files.push(filename);
+                  }
+
+                });
+
+              }
 
             });
-
-          }
         });
 
-      callback();
+        callback();
+
+      });
 
     });
 
