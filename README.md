@@ -20,3 +20,12 @@ const BlessCSSWebpackPlugin = require('bless-css-webpack-plugin');
   ]
 }
 ```
+
+## Differences from bless-webpack-plugin
+* Works with the html webpack plugin
+* Has tests
+* Uses bless 4.0
+* Works with sourcemaps (TODO)
+
+## License
+MIT
