@@ -4,9 +4,9 @@
   "description": "A webpack plugin for bless CSS",
   "main": "src/plugin.js",
   "scripts": {
-    "test": "npm run lint && mocha --timeout 5000",
+    "test": "npm run lint && mocha",
     "lint": "eslint src test",
-    "start": "mocha --timeout 5000 --watch test/*.spec.js",
+    "start": "mocha --watch test/*.spec.js",
     "preversion": "npm test",
     "postversion": "npm publish"
   },
