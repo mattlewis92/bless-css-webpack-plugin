@@ -30,5 +30,9 @@ const BlessCSSWebpackPlugin = require('bless-css-webpack-plugin');
 * Uses bless 4.0
 * Works with sourcemaps
 
+## Credits
+* The webpack source code and readme for how to write a plugin
+* The original `bless-webpack-plugin` plugin
+
 ## License
 MIT
