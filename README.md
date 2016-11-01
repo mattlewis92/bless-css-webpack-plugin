@@ -1,4 +1,4 @@
-# bless-css-webpack-plugin
+# bless-css-webpack-plugin [![Build Status](https://travis-ci.org/mattlewis92/bless-css-webpack-plugin.svg?branch=master)](https://travis-ci.org/mattlewis92/bless-css-webpack-plugin)
 A webpack plugin for bless CSS
 
 ## Installation
