@@ -16,16 +16,19 @@ const BlessCSSWebpackPlugin = require('bless-css-webpack-plugin');
 // in your webpack config
 {
   plugins: [
-    new BlessCSSWebpackPlugin()
+    new BlessCSSWebpackPlugin(options)
   ]
 }
 ```
+### options
+
+* `sourceMap` - set to `true` to enable sourcemaps. Default `false`.
 
 ## Differences from bless-webpack-plugin
 * Works with the html webpack plugin
 * Has tests
 * Uses bless 4.0
-* Works with sourcemaps (TODO)
+* Works with sourcemaps
 
 ## License
 MIT

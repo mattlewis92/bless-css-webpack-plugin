@@ -138,3 +138,41 @@ it('should support the html webpack plugin', done => {
   }).catch(done);
 
 });
+
+it('should support sourcemaps', done => {
+
+  const extractCSS = new ExtractTextPlugin('[name].css');
+
+  const webpackConfig = {
+    entry: __dirname + '/fixtures/scss/entry.js',
+    devtool: 'sourcemap',
+    output: {
+      path: os.tmpdir() + '/output',
+    },
+    module: {
+      loaders: [{
+        test: /\.scss$/,
+        loader: extractCSS.extract(['css-loader?sourceMap', 'sass-loader?sourceMap'])
+      }]
+    },
+    plugins: [
+      new BlessCSSWebpackPlugin({
+        sourceMap: true
+      }),
+      extractCSS
+    ]
+  };
+
+  webpack(webpackConfig, (err, stats) => {
+
+    if (err) {
+      done(err);
+    } else {
+      expect(stats.compilation.assets['main.css.map']).to.be.ok;
+      expect(stats.compilation.assets['main-blessed1.css.map']).to.be.ok;
+      done();
+    }
+
+  });
+
+});

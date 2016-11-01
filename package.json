@@ -28,7 +28,7 @@
   "homepage": "https://github.com/mattlewis92/bless-css-webpack-plugin#readme",
   "dependencies": {
     "bless": "^4.0.4",
-    "webpack-sources": "~0.1.2"
+    "webpack-sources": "^0.1.2"
   },
   "devDependencies": {
     "chai": "^3.5.0",
