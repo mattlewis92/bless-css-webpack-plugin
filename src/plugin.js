@@ -1,3 +1,5 @@
+'use strict';
+
 const bless = require('bless');
 const {RawSource, SourceMapSource} = require('webpack-sources');
 
