@@ -1,4 +1,5 @@
 const bless = require('bless');
+const {RawSource} = require('webpack-sources');
 
 const CSS_REGEXP = /\.css$/;
 
@@ -24,14 +25,7 @@ class BlessCSSWebpackPlugin {
 
                   const filename = index === 0 ? cssFileName : `${filenameWithoutExtension}-blessed${index}.css`;
 
-                  compilation.assets[filename] = {
-                    source() {
-                      return file;
-                    },
-                    size() {
-                      return file.length;
-                    }
-                  };
+                  compilation.assets[filename] = new RawSource(file);
 
                   if (index > 0) {
                     chunk.files.push(filename);
