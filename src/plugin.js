@@ -6,16 +6,17 @@ class BlessCSSWebpackPlugin {
 
   apply(compiler) {
 
-    compiler.plugin('this-compilation', (compilation) => {
+    compiler.plugin('compilation', (compilation) => {
 
-      compilation.plugin('optimize-assets', (assets, callback) => {
+      compilation.plugin('optimize-chunk-assets', (chunks, callback) => {
 
-        compilation.chunks.forEach(chunk => {
+        chunks.forEach(chunk => {
           chunk.files
             .filter(filename => filename.match(CSS_REGEXP))
             .forEach(cssFileName => {
 
-              const parsedData = bless.chunk(assets[cssFileName].source(), {source: cssFileName});
+              const parsedData = bless.chunk(compilation.assets[cssFileName].source(), {source: cssFileName});
+
               if (parsedData.data.length > 1) {
                 const filenameWithoutExtension = cssFileName.replace(CSS_REGEXP, '');
 
@@ -23,7 +24,7 @@ class BlessCSSWebpackPlugin {
 
                   const filename = index === 0 ? cssFileName : `${filenameWithoutExtension}-blessed${index}.css`;
 
-                  assets[filename] = {
+                  compilation.assets[filename] = {
                     source() {
                       return file;
                     },
