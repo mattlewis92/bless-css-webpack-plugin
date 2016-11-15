@@ -1,13 +1,16 @@
 'use strict';
 
 const bless = require('bless');
-const {RawSource, SourceMapSource} = require('webpack-sources');
+const webpackSources = require('webpack-sources');
+const RawSource = webpackSources.RawSource;
+const SourceMapSource = webpackSources.SourceMapSource;
 
 const CSS_REGEXP = /\.css$/;
 
 class BlessCSSWebpackPlugin {
 
-  constructor(options = {sourceMap: false}) {
+  constructor(options) {
+    options = options || {sourceMap: false};
     this.options = options;
   }
 

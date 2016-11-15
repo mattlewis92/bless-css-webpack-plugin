@@ -3,7 +3,7 @@
 const os = require('os');
 const fs = require('fs');
 const webpack = require('webpack');
-const {expect} = require('chai');
+const expect = require('chai').expect;
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BlessCSSWebpackPlugin = require('./../src/plugin');
@@ -25,7 +25,9 @@ it('should chunk up CSS into multiple files', done => {
   Promise.all([
     readFile(__dirname + '/fixtures/expected/main.css'),
     readFile(__dirname + '/fixtures/expected/main-blessed1.css')
-  ]).then(([main1, main2]) => {
+  ]).then((main) => {
+    const main1 = main[0];
+    const main2 = main[1];
     const extractCSS = new ExtractTextPlugin('[name].css');
 
     const webpackConfig = {
@@ -67,7 +69,9 @@ it('should compile SASS, then chunk it into multiple files', done => {
   Promise.all([
     readFile(__dirname + '/fixtures/expected/main.css'),
     readFile(__dirname + '/fixtures/expected/main-blessed1.css')
-  ]).then(([main1, main2]) => {
+  ]).then((main) => {
+    const main1 = main[0];
+    const main2 = main[1];
     const extractCSS = new ExtractTextPlugin('[name].css');
 
     const webpackConfig = {
