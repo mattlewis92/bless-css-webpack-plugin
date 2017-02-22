@@ -28,7 +28,6 @@ it('should chunk up CSS into multiple files', done => {
   ]).then((main) => {
     const main1 = main[0];
     const main2 = main[1];
-    const extractCSS = new ExtractTextPlugin('[name].css');
 
     const webpackConfig = {
       entry: __dirname + '/fixtures/css/entry.js',
@@ -36,14 +35,17 @@ it('should chunk up CSS into multiple files', done => {
         path: os.tmpdir() + '/output',
       },
       module: {
-        loaders: [{
+        rules: [{
           test: /\.css$/,
-          loader: extractCSS.extract(['css-loader'])
+          use: ExtractTextPlugin.extract({
+            fallback: 'style-loader',
+            use: 'css-loader'
+          })
         }]
       },
       plugins: [
         new BlessCSSWebpackPlugin(),
-        extractCSS
+        new ExtractTextPlugin('[name].css')
       ]
     };
 
@@ -72,7 +74,6 @@ it('should compile SASS, then chunk it into multiple files', done => {
   ]).then((main) => {
     const main1 = main[0];
     const main2 = main[1];
-    const extractCSS = new ExtractTextPlugin('[name].css');
 
     const webpackConfig = {
       entry: __dirname + '/fixtures/scss/entry.js',
@@ -80,14 +81,17 @@ it('should compile SASS, then chunk it into multiple files', done => {
         path: os.tmpdir() + '/output',
       },
       module: {
-        loaders: [{
+        rules: [{
           test: /\.scss$/,
-          loader: extractCSS.extract(['css-loader', 'sass-loader'])
+          use: ExtractTextPlugin.extract({
+            fallback: 'style-loader',
+            use: ['css-loader', 'sass-loader']
+          })
         }]
       },
       plugins: [
         new BlessCSSWebpackPlugin(),
-        extractCSS
+        new ExtractTextPlugin('[name].css')
       ]
     };
 
@@ -111,7 +115,6 @@ it('should compile SASS, then chunk it into multiple files', done => {
 it('should support the html webpack plugin', done => {
 
   readFile(__dirname + '/fixtures/expected/index.html').then(index => {
-    const extractCSS = new ExtractTextPlugin('[name].css');
 
     const webpackConfig = {
       entry: __dirname + '/fixtures/css/entry.js',
@@ -119,15 +122,18 @@ it('should support the html webpack plugin', done => {
         path: os.tmpdir() + '/output',
       },
       module: {
-        loaders: [{
+        rules: [{
           test: /\.css$/,
-          loader: extractCSS.extract(['css-loader'])
+          use: ExtractTextPlugin.extract({
+            fallback: 'style-loader',
+            use: 'css-loader'
+          })
         }]
       },
       plugins: [
         new HtmlWebpackPlugin(),
         new BlessCSSWebpackPlugin(),
-        extractCSS
+        new ExtractTextPlugin('[name].css')
       ]
     };
 
@@ -147,8 +153,6 @@ it('should support the html webpack plugin', done => {
 
 it('should support sourcemaps', done => {
 
-  const extractCSS = new ExtractTextPlugin('[name].css');
-
   const webpackConfig = {
     entry: __dirname + '/fixtures/scss/entry.js',
     devtool: 'sourcemap',
@@ -156,16 +160,19 @@ it('should support sourcemaps', done => {
       path: os.tmpdir() + '/output',
     },
     module: {
-      loaders: [{
+      rules: [{
         test: /\.scss$/,
-        loader: extractCSS.extract(['css-loader?sourceMap', 'sass-loader?sourceMap'])
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader?sourceMap', 'sass-loader?sourceMap']
+        })
       }]
     },
     plugins: [
       new BlessCSSWebpackPlugin({
         sourceMap: true
       }),
-      extractCSS
+      new ExtractTextPlugin('[name].css')
     ]
   };
 
