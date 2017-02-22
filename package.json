@@ -4,7 +4,8 @@
   "description": "A webpack plugin for bless CSS",
   "main": "src/plugin.js",
   "scripts": {
-    "test": "npm run lint && mocha",
+    "pretest": "npm run lint",
+    "test": "nyc mocha",
     "lint": "xo",
     "start": "mocha --watch test/*.spec.js",
     "preversion": "npm test",
@@ -32,11 +33,13 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "codecov-lite": "^0.1.3",
     "css-loader": "^0.26.1",
     "extract-text-webpack-plugin": "^2.0.0-rc.3",
     "html-webpack-plugin": "^2.24.1",
     "mocha": "^3.1.2",
     "node-sass": "^4.5.0",
+    "nyc": "^10.1.2",
     "sass-loader": "^6.0.2",
     "style-loader": "^0.13.1",
     "webpack": "^2.2.1",
@@ -53,6 +56,13 @@
     "envs": [
       "node",
       "mocha"
+    ]
+  },
+  "nyc": {
+    "reporter": [
+      "lcovonly",
+      "text-summary",
+      "html"
     ]
   }
 }

@@ -1,5 +1,12 @@
-# bless-css-webpack-plugin [![Build Status](https://travis-ci.org/mattlewis92/bless-css-webpack-plugin.svg?branch=master)](https://travis-ci.org/mattlewis92/bless-css-webpack-plugin)
-A webpack plugin for bless CSS
+# bless-css-webpack-plugin
+
+> A webpack plugin for bless CSS
+
+[![npm version](https://badge.fury.io/js/bless-css-webpack-plugin.svg)](http://badge.fury.io/js/bless-css-webpack-plugin)
+[![Build Status](https://travis-ci.org/mattlewis92/bless-css-webpack-plugin.svg)](https://travis-ci.org/mattlewis92/bless-css-webpack-plugin)
+[![codecov](https://codecov.io/gh/mattlewis92/bless-css-webpack-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/mattlewis92/bless-css-webpack-plugin)
+[![Dependency Status](https://david-dm.org/mattlewis92/bless-css-webpack-plugin.svg)](https://david-dm.org/mattlewis92/bless-css-webpack-plugin)
+[![devDependency Status](https://david-dm.org/mattlewis92/bless-css-webpack-plugin/dev-status.svg)](https://david-dm.org/mattlewis92/bless-css-webpack-plugin?type=dev)
 
 ## Installation
 
