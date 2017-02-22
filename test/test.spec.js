@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const os = require('os');
 const fs = require('fs');
 const webpack = require('webpack');
@@ -21,18 +22,17 @@ const readFile = path => {
 };
 
 it('should chunk up CSS into multiple files', done => {
-
   Promise.all([
-    readFile(__dirname + '/fixtures/expected/main.css'),
-    readFile(__dirname + '/fixtures/expected/main-blessed1.css')
-  ]).then((main) => {
+    readFile(path.join(__dirname, 'fixtures/expected/main.css')),
+    readFile(path.join(__dirname, 'fixtures/expected/main-blessed1.css'))
+  ]).then(main => {
     const main1 = main[0];
     const main2 = main[1];
 
     const webpackConfig = {
-      entry: __dirname + '/fixtures/css/entry.js',
+      entry: path.join(__dirname, 'fixtures/css/entry.js'),
       output: {
-        path: os.tmpdir() + '/output',
+        path: os.tmpdir() + '/output'
       },
       module: {
         rules: [{
@@ -50,7 +50,6 @@ it('should chunk up CSS into multiple files', done => {
     };
 
     webpack(webpackConfig, (err, stats) => {
-
       if (err) {
         done(err);
       } else {
@@ -60,25 +59,22 @@ it('should chunk up CSS into multiple files', done => {
         expect(stats.compilation.assets['main-blessed1.css'].source()).to.equal(main2);
         done();
       }
-
     });
   }).catch(done);
-
 });
 
 it('should compile SASS, then chunk it into multiple files', done => {
-
   Promise.all([
-    readFile(__dirname + '/fixtures/expected/main.css'),
-    readFile(__dirname + '/fixtures/expected/main-blessed1.css')
-  ]).then((main) => {
+    readFile(path.join(__dirname, 'fixtures/expected/main.css')),
+    readFile(path.join(__dirname, 'fixtures/expected/main-blessed1.css'))
+  ]).then(main => {
     const main1 = main[0];
     const main2 = main[1];
 
     const webpackConfig = {
-      entry: __dirname + '/fixtures/scss/entry.js',
+      entry: path.join(__dirname, 'fixtures/scss/entry.js'),
       output: {
-        path: os.tmpdir() + '/output',
+        path: os.tmpdir() + '/output'
       },
       module: {
         rules: [{
@@ -96,7 +92,6 @@ it('should compile SASS, then chunk it into multiple files', done => {
     };
 
     webpack(webpackConfig, (err, stats) => {
-
       if (err) {
         done(err);
       } else {
@@ -106,20 +101,16 @@ it('should compile SASS, then chunk it into multiple files', done => {
         expect(stats.compilation.assets['main-blessed1.css'].source()).to.equal(main2);
         done();
       }
-
     });
   }).catch(done);
-
 });
 
 it('should support the html webpack plugin', done => {
-
-  readFile(__dirname + '/fixtures/expected/index.html').then(index => {
-
+  readFile(path.join(__dirname, 'fixtures/expected/index.html')).then(index => {
     const webpackConfig = {
-      entry: __dirname + '/fixtures/css/entry.js',
+      entry: path.join(__dirname, 'fixtures/css/entry.js'),
       output: {
-        path: os.tmpdir() + '/output',
+        path: os.tmpdir() + '/output'
       },
       module: {
         rules: [{
@@ -138,26 +129,22 @@ it('should support the html webpack plugin', done => {
     };
 
     webpack(webpackConfig, (err, stats) => {
-
       if (err) {
         done(err);
       } else {
         expect(stats.compilation.assets['index.html'].source()).to.equal(index);
         done();
       }
-
     });
   }).catch(done);
-
 });
 
 it('should support sourcemaps', done => {
-
   const webpackConfig = {
-    entry: __dirname + '/fixtures/scss/entry.js',
+    entry: path.join(__dirname, 'fixtures/scss/entry.js'),
     devtool: 'sourcemap',
     output: {
-      path: os.tmpdir() + '/output',
+      path: os.tmpdir() + '/output'
     },
     module: {
       rules: [{
@@ -177,15 +164,12 @@ it('should support sourcemaps', done => {
   };
 
   webpack(webpackConfig, (err, stats) => {
-
     if (err) {
       done(err);
     } else {
-      expect(stats.compilation.assets['main.css.map']).to.be.ok;
-      expect(stats.compilation.assets['main-blessed1.css.map']).to.be.ok;
+      expect(Boolean(stats.compilation.assets['main.css.map'])).to.equal(true);
+      expect(Boolean(stats.compilation.assets['main-blessed1.css.map'])).to.equal(true);
       done();
     }
-
   });
-
 });
