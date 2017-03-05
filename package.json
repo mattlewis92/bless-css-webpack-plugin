@@ -9,7 +9,8 @@
     "lint": "xo",
     "start": "mocha --watch test/*.spec.js",
     "preversion": "npm test",
-    "postversion": "npm publish"
+    "postversion": "npm publish",
+    "codecov": "cat coverage/lcov.info | codecov"
   },
   "repository": {
     "type": "git",
