@@ -76,7 +76,7 @@ class BlessCSSWebpackPlugin {
                     compilation.assets[filename] = new RawSource(fileContents);
                   }
 
-                  if (index > 0) {
+                  if (index > 0 && !this.options.importRules) {
                     chunk.files.push(filename);
                   }
                 });
