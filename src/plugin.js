@@ -40,18 +40,21 @@ class BlessCSSWebpackPlugin {
 
               const filenameWithoutExtension = cssFileName.replace(CSS_REGEXP, '');
 
-              /**
-               * Inject @import rules into the primary .css file for all others
-               */
-              if (this.options.importRules) {
-                const parsedDataSimple = bless.chunk(input.source);
-                input.source = this.injectImportRules(input.source, parsedDataSimple, filenameWithoutExtension);
-              }
-
               const parsedData = bless.chunk(input.source, {
                 sourcemaps: this.options.sourceMap,
                 source: this.options.sourceMap ? input.map.sources[0] : null
               });
+
+              if (this.options.importRules) {
+                // Reverse data to have sequential @import rules
+                parsedData.data.reverse();
+
+                // Chunk the data for use in creating import lines
+                const parsedDataSimple = bless.chunk(input.source);
+
+                // Inject imports into primary created file
+                parsedData.data[0] = this.injectImportRules(parsedData.data[0], parsedDataSimple, filenameWithoutExtension);
+              }
 
               if (parsedData.data.length > 1) {
                 parsedData.data.forEach((fileContents, index) => { // eslint-disable-line max-nested-callbacks
@@ -83,7 +86,7 @@ class BlessCSSWebpackPlugin {
     let importRules = '';
     parsedData.data.map((fileContents, index) => { // eslint-disable-line max-nested-callbacks
       if (index > 0) {
-        const filename = `${filenameWithoutExtension}-blessed${index}.css`;
+        const filename = `${filenameWithoutExtension}-blessed${parsedData.data.length - index}.css`;
         // E.g. @import url(app-blessed1.css);
         importRules += '@import url(' + filename + ');\n';
       }
