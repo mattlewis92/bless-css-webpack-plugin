@@ -173,3 +173,36 @@ it('should support sourcemaps', done => {
     }
   });
 });
+
+it('should support adding import rules', done => {
+  const webpackConfig = {
+    entry: path.join(__dirname, 'fixtures/scss/entry.js'),
+    output: {
+      path: os.tmpdir() + '/output'
+    },
+    module: {
+      rules: [{
+        test: /\.scss$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader', 'sass-loader']
+        })
+      }]
+    },
+    plugins: [
+      new BlessCSSWebpackPlugin({
+        importRules: true
+      }),
+      new ExtractTextPlugin('[name].css')
+    ]
+  };
+
+  webpack(webpackConfig, (err, stats) => {
+    if (err) {
+      done(err);
+    } else {
+      expect(stats.compilation.assets['main.css'].source().substr(0, 31)).to.equal('@import url(main-blessed1.css);');
+      done();
+    }
+  });
+});

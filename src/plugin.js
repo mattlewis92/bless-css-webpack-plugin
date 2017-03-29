@@ -47,7 +47,7 @@ class BlessCSSWebpackPlugin {
                 const parsedDataSimple = bless.chunk(input.source);
                 let importRules = '';
 
-                parsedDataSimple.data.map((fileContents, index) => {
+                parsedDataSimple.data.map((fileContents, index) => { // eslint-disable-line max-nested-callbacks
                   if (index > 0) {
                     const filename = `${filenameWithoutExtension}-blessed${index}.css`;
                     // E.g. @import url(app-blessed1.css);
