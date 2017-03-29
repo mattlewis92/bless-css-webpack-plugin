@@ -45,19 +45,7 @@ class BlessCSSWebpackPlugin {
                */
               if (this.options.importRules) {
                 const parsedDataSimple = bless.chunk(input.source);
-                let importRules = '';
-
-                parsedDataSimple.data.map((fileContents, index) => { // eslint-disable-line max-nested-callbacks
-                  if (index > 0) {
-                    const filename = `${filenameWithoutExtension}-blessed${index}.css`;
-                    // E.g. @import url(app-blessed1.css);
-                    importRules += '@import url(' + filename + ');\n';
-                  }
-                  return fileContents;
-                });
-
-                // Inject into input.source
-                input.source = importRules + input.source;
+                input.source = this.injectImportRules(input.source, parsedDataSimple, filenameWithoutExtension);
               }
 
               const parsedData = bless.chunk(input.source, {
@@ -76,7 +64,7 @@ class BlessCSSWebpackPlugin {
                     compilation.assets[filename] = new RawSource(fileContents);
                   }
 
-                  if (index > 0 && !this.options.importRules) {
+                  if (index > 0) {
                     chunk.files.push(filename);
                   }
                 });
@@ -86,6 +74,24 @@ class BlessCSSWebpackPlugin {
         callback();
       });
     });
+  }
+
+  /**
+   * Inject @import rules into a .css file for all others
+   */
+  injectImportRules(source, parsedData, filenameWithoutExtension) {
+    let importRules = '';
+    parsedData.data.map((fileContents, index) => { // eslint-disable-line max-nested-callbacks
+      if (index > 0) {
+        const filename = `${filenameWithoutExtension}-blessed${index}.css`;
+        // E.g. @import url(app-blessed1.css);
+        importRules += '@import url(' + filename + ');\n';
+      }
+      return fileContents;
+    });
+
+    // Inject into input.source
+    return importRules + source;
   }
 
 }
