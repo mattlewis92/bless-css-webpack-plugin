@@ -10,7 +10,10 @@ const CSS_REGEXP = /\.css$/;
 class BlessCSSWebpackPlugin {
 
   constructor(options) {
-    options = options || {sourceMap: false};
+    options = options || {
+      sourceMap: false,
+      importRules: false
+    };
     this.options = options;
   }
 
@@ -35,13 +38,33 @@ class BlessCSSWebpackPlugin {
                 input.source = asset.source();
               }
 
+              const filenameWithoutExtension = cssFileName.replace(CSS_REGEXP, '');
+
+              /**
+               * Inject @import rules into the primary .css file for all others
+               */
+              if (this.options.importRules) {
+                const parsedDataSimple = bless.chunk(input.source);
+                let importRules = '';
+
+                parsedDataSimple.data.map((fileContents, index) => {
+                  if (index == 0) return;
+
+                  let filename = index === 0 ? cssFileName : `${filenameWithoutExtension}-blessed${index}.css`;
+                  //e.g. @import url(app-blessed1.css);
+                  importRules += '@import url(' + filename + ');\n';
+                });
+
+                // Inject into input.source
+                input.source = importRules + input.source;
+              }
+
               const parsedData = bless.chunk(input.source, {
                 sourcemaps: this.options.sourceMap,
                 source: this.options.sourceMap ? input.map.sources[0] : null
               });
 
               if (parsedData.data.length > 1) {
-                const filenameWithoutExtension = cssFileName.replace(CSS_REGEXP, '');
 
                 parsedData.data.forEach((fileContents, index) => { // eslint-disable-line max-nested-callbacks
                   const filename = index === 0 ? cssFileName : `${filenameWithoutExtension}-blessed${index}.css`;

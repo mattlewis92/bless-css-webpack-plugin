@@ -30,6 +30,7 @@ const BlessCSSWebpackPlugin = require('bless-css-webpack-plugin');
 ### options
 
 * `sourceMap` - set to `true` to enable sourcemaps. Default `false`.
+* `importRules` - set to `true` to inject @import rules for generated files. Default `false`.
 
 ## Differences from bless-webpack-plugin
 * Works with the html webpack plugin
