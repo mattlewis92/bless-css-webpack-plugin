@@ -48,11 +48,12 @@ class BlessCSSWebpackPlugin {
                 let importRules = '';
 
                 parsedDataSimple.data.map((fileContents, index) => {
-                  if (index == 0) return;
-
-                  let filename = index === 0 ? cssFileName : `${filenameWithoutExtension}-blessed${index}.css`;
-                  //e.g. @import url(app-blessed1.css);
-                  importRules += '@import url(' + filename + ');\n';
+                  if (index > 0) {
+                    const filename = index === 0 ? cssFileName : `${filenameWithoutExtension}-blessed${index}.css`;
+                    // E.g. @import url(app-blessed1.css);
+                    importRules += '@import url(' + filename + ');\n';
+                  }
+                  return fileContents;
                 });
 
                 // Inject into input.source
@@ -65,7 +66,6 @@ class BlessCSSWebpackPlugin {
               });
 
               if (parsedData.data.length > 1) {
-
                 parsedData.data.forEach((fileContents, index) => { // eslint-disable-line max-nested-callbacks
                   const filename = index === 0 ? cssFileName : `${filenameWithoutExtension}-blessed${index}.css`;
                   const outputSourceMap = parsedData.maps[index];
