@@ -49,7 +49,7 @@ class BlessCSSWebpackPlugin {
 
                 parsedDataSimple.data.map((fileContents, index) => {
                   if (index > 0) {
-                    const filename = index === 0 ? cssFileName : `${filenameWithoutExtension}-blessed${index}.css`;
+                    const filename = `${filenameWithoutExtension}-blessed${index}.css`;
                     // E.g. @import url(app-blessed1.css);
                     importRules += '@import url(' + filename + ');\n';
                   }
