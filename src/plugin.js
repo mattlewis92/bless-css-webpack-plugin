@@ -7,6 +7,10 @@ const RawSource = webpackSources.RawSource;
 const SourceMapSource = webpackSources.SourceMapSource;
 const CSS_REGEXP = /\.css$/;
 
+function createBlessedFileName(filenameWithoutExtension, index) {
+  return `${filenameWithoutExtension}-blessed${parsedData.data.length - index}.css`;
+}
+
 /**
  * Inject @import rules into a .css file for all others
  */
@@ -14,7 +18,7 @@ function addImports(source, parsedData, filenameWithoutExtension) {
   let addImports = '';
   parsedData.data.map((fileContents, index) => { // eslint-disable-line max-nested-callbacks
     if (index > 0) {
-      const filename = `${filenameWithoutExtension}-blessed${parsedData.data.length - index}.css`;
+      const filename = createBlessedFileName(filenameWithoutExtension, parsedData.data.length - index);
       // E.g. @import url(app-blessed1.css);
       addImports += '@import url(' + filename + ');\n';
     }
@@ -76,7 +80,7 @@ class BlessCSSWebpackPlugin {
 
               if (parsedData.data.length > 1) {
                 parsedData.data.forEach((fileContents, index) => { // eslint-disable-line max-nested-callbacks
-                  const filename = index === 0 ? cssFileName : `${filenameWithoutExtension}-blessed${index}.css`;
+                  const filename = index === 0 ? cssFileName : createBlessedFileName(filenameWithoutExtension, index);
                   const outputSourceMap = parsedData.maps[index];
 
                   if (outputSourceMap) {
