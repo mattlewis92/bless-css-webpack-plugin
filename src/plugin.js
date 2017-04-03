@@ -8,7 +8,7 @@ const SourceMapSource = webpackSources.SourceMapSource;
 const CSS_REGEXP = /\.css$/;
 
 function createBlessedFileName(filenameWithoutExtension, index) {
-  return `${filenameWithoutExtension}-blessed${parsedData.data.length - index}.css`;
+  return `${filenameWithoutExtension}-blessed${index}.css`;
 }
 
 /**
