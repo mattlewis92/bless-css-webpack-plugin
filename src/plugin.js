@@ -22,7 +22,7 @@ function addImports(parsedData, filenameWithoutExtension) {
     if (index !== sourceToInjectIndex) {
       const filename = createBlessedFileName(filenameWithoutExtension, index);
       // E.g. @import url(app-blessed1.css);
-      addImports += '@import url(' + filename + ');\n';
+      addImports += `@import url(${filename});\n`;
     }
     return fileContents;
   });
