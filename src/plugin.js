@@ -7,10 +7,38 @@ const RawSource = webpackSources.RawSource;
 const SourceMapSource = webpackSources.SourceMapSource;
 const CSS_REGEXP = /\.css$/;
 
+function createBlessedFileName(filenameWithoutExtension, index) {
+  return index === 0 ? `${filenameWithoutExtension}.css` : `${filenameWithoutExtension}-blessed${index}.css`;
+}
+
+/**
+ * Inject @import rules into a .css file for all others
+ */
+function addImports(parsedData, filenameWithoutExtension) {
+  let sourceToInjectIndex = parsedData.data.length - 1;
+  let addImports = '';
+
+  parsedData.data.map((fileContents, index) => { // eslint-disable-line max-nested-callbacks
+    if (index !== sourceToInjectIndex) {
+      const filename = createBlessedFileName(filenameWithoutExtension, index);
+      // E.g. @import url(app-blessed1.css);
+      addImports += `@import url(${filename});\n`;
+    }
+    return fileContents;
+  });
+
+  parsedData.data[sourceToInjectIndex] = `${addImports}\n${parsedData.data[sourceToInjectIndex]}`;
+
+  return parsedData;
+}
+
 class BlessCSSWebpackPlugin {
 
   constructor(options) {
-    options = options || {sourceMap: false};
+    options = options || {
+      sourceMap: false,
+      addImports: false
+    };
     this.options = options;
   }
 
@@ -35,16 +63,21 @@ class BlessCSSWebpackPlugin {
                 input.source = asset.source();
               }
 
-              const parsedData = bless.chunk(input.source, {
+              const filenameWithoutExtension = cssFileName.replace(CSS_REGEXP, '');
+
+              let parsedData = bless.chunk(input.source, {
                 sourcemaps: this.options.sourceMap,
                 source: this.options.sourceMap ? input.map.sources[0] : null
               });
 
               if (parsedData.data.length > 1) {
-                const filenameWithoutExtension = cssFileName.replace(CSS_REGEXP, '');
+                if (this.options.addImports) {
+                  // Inject imports into primary created file
+                  parsedData = addImports(parsedData, filenameWithoutExtension);
+                }
 
                 parsedData.data.forEach((fileContents, index) => { // eslint-disable-line max-nested-callbacks
-                  const filename = index === 0 ? cssFileName : `${filenameWithoutExtension}-blessed${index}.css`;
+                  const filename = createBlessedFileName(filenameWithoutExtension, index);
                   const outputSourceMap = parsedData.maps[index];
 
                   if (outputSourceMap) {
@@ -53,10 +86,14 @@ class BlessCSSWebpackPlugin {
                     compilation.assets[filename] = new RawSource(fileContents);
                   }
 
-                  if (index > 0) {
+                  if ((index > 0 && !this.options.addImports) || (index === parsedData.data.length - 1 && this.options.addImports)) {
                     chunk.files.push(filename);
                   }
                 });
+
+                if (this.options.addImports) {
+                  chunk.files = chunk.files.filter(file => file !== cssFileName); // eslint-disable-line max-nested-callbacks
+                }
               }
             });
         });
