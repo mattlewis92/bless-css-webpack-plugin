@@ -8,25 +8,28 @@ const SourceMapSource = webpackSources.SourceMapSource;
 const CSS_REGEXP = /\.css$/;
 
 function createBlessedFileName(filenameWithoutExtension, index) {
-  return `${filenameWithoutExtension}-blessed${index}.css`;
+  return index === 0 ? `${filenameWithoutExtension}.css` : `${filenameWithoutExtension}-blessed${index}.css`;
 }
 
 /**
  * Inject @import rules into a .css file for all others
  */
-function addImports(source, parsedData, filenameWithoutExtension) {
+function addImports(parsedData, filenameWithoutExtension) {
+  let sourceToInjectIndex = parsedData.data.length - 1;
   let addImports = '';
+
   parsedData.data.map((fileContents, index) => { // eslint-disable-line max-nested-callbacks
-    if (index > 0) {
-      const filename = createBlessedFileName(filenameWithoutExtension, parsedData.data.length - index);
+    if (index !== sourceToInjectIndex) {
+      const filename = createBlessedFileName(filenameWithoutExtension, index);
       // E.g. @import url(app-blessed1.css);
       addImports += '@import url(' + filename + ');\n';
     }
     return fileContents;
   });
 
-  // Inject into input.source
-  return addImports + source;
+  parsedData.data[sourceToInjectIndex] = `${addImports}\n${parsedData.data[sourceToInjectIndex]}`;
+
+  return parsedData;
 }
 
 class BlessCSSWebpackPlugin {
@@ -62,25 +65,20 @@ class BlessCSSWebpackPlugin {
 
               const filenameWithoutExtension = cssFileName.replace(CSS_REGEXP, '');
 
-              const parsedData = bless.chunk(input.source, {
+              let parsedData = bless.chunk(input.source, {
                 sourcemaps: this.options.sourceMap,
                 source: this.options.sourceMap ? input.map.sources[0] : null
               });
 
-              if (this.options.addImports) {
-                // Reverse data to have sequential @import rules
-                parsedData.data.reverse();
-
-                // Chunk the data for use in creating import lines
-                const parsedDataSimple = bless.chunk(input.source);
-
-                // Inject imports into primary created file
-                parsedData.data[0] = addImports(parsedData.data[0], parsedDataSimple, filenameWithoutExtension);
-              }
-
               if (parsedData.data.length > 1) {
+
+                if (this.options.addImports) {
+                  // Inject imports into primary created file
+                  parsedData = addImports(parsedData, filenameWithoutExtension);
+                }
+
                 parsedData.data.forEach((fileContents, index) => { // eslint-disable-line max-nested-callbacks
-                  const filename = index === 0 ? cssFileName : createBlessedFileName(filenameWithoutExtension, index);
+                  const filename = createBlessedFileName(filenameWithoutExtension, index);
                   const outputSourceMap = parsedData.maps[index];
 
                   if (outputSourceMap) {
@@ -89,10 +87,17 @@ class BlessCSSWebpackPlugin {
                     compilation.assets[filename] = new RawSource(fileContents);
                   }
 
-                  if (index > 0) {
+                  if (index > 0 && !this.options.addImports) {
+                    chunk.files.push(filename);
+                  } else if (index === parsedData.data.length - 1 && this.options.addImports) {
                     chunk.files.push(filename);
                   }
                 });
+
+                if (this.options.addImports) {
+                  chunk.files = chunk.files.filter(file => file !== cssFileName);
+                }
+
               }
             });
         });
