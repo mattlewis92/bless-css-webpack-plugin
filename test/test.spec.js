@@ -191,7 +191,7 @@ it('should support adding import rules', done => {
     },
     plugins: [
       new BlessCSSWebpackPlugin({
-        importRules: true
+        addImports: true
       }),
       new ExtractTextPlugin('[name].css')
     ]

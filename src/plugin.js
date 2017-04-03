@@ -7,12 +7,30 @@ const RawSource = webpackSources.RawSource;
 const SourceMapSource = webpackSources.SourceMapSource;
 const CSS_REGEXP = /\.css$/;
 
+/**
+ * Inject @import rules into a .css file for all others
+ */
+function addImports(source, parsedData, filenameWithoutExtension) {
+  let addImports = '';
+  parsedData.data.map((fileContents, index) => { // eslint-disable-line max-nested-callbacks
+    if (index > 0) {
+      const filename = `${filenameWithoutExtension}-blessed${parsedData.data.length - index}.css`;
+      // E.g. @import url(app-blessed1.css);
+      addImports += '@import url(' + filename + ');\n';
+    }
+    return fileContents;
+  });
+
+  // Inject into input.source
+  return addImports + source;
+}
+
 class BlessCSSWebpackPlugin {
 
   constructor(options) {
     options = options || {
       sourceMap: false,
-      importRules: false
+      addImports: false
     };
     this.options = options;
   }
@@ -45,7 +63,7 @@ class BlessCSSWebpackPlugin {
                 source: this.options.sourceMap ? input.map.sources[0] : null
               });
 
-              if (this.options.importRules) {
+              if (this.options.addImports) {
                 // Reverse data to have sequential @import rules
                 parsedData.data.reverse();
 
@@ -53,7 +71,7 @@ class BlessCSSWebpackPlugin {
                 const parsedDataSimple = bless.chunk(input.source);
 
                 // Inject imports into primary created file
-                parsedData.data[0] = this.injectImportRules(parsedData.data[0], parsedDataSimple, filenameWithoutExtension);
+                parsedData.data[0] = addImports(parsedData.data[0], parsedDataSimple, filenameWithoutExtension);
               }
 
               if (parsedData.data.length > 1) {
@@ -77,24 +95,6 @@ class BlessCSSWebpackPlugin {
         callback();
       });
     });
-  }
-
-  /**
-   * Inject @import rules into a .css file for all others
-   */
-  injectImportRules(source, parsedData, filenameWithoutExtension) {
-    let importRules = '';
-    parsedData.data.map((fileContents, index) => { // eslint-disable-line max-nested-callbacks
-      if (index > 0) {
-        const filename = `${filenameWithoutExtension}-blessed${parsedData.data.length - index}.css`;
-        // E.g. @import url(app-blessed1.css);
-        importRules += '@import url(' + filename + ');\n';
-      }
-      return fileContents;
-    });
-
-    // Inject into input.source
-    return importRules + source;
   }
 
 }
