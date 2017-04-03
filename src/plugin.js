@@ -71,7 +71,6 @@ class BlessCSSWebpackPlugin {
               });
 
               if (parsedData.data.length > 1) {
-
                 if (this.options.addImports) {
                   // Inject imports into primary created file
                   parsedData = addImports(parsedData, filenameWithoutExtension);
@@ -95,9 +94,8 @@ class BlessCSSWebpackPlugin {
                 });
 
                 if (this.options.addImports) {
-                  chunk.files = chunk.files.filter(file => file !== cssFileName);
+                  chunk.files = chunk.files.filter(file => file !== cssFileName); // eslint-disable-line max-nested-callbacks
                 }
-
               }
             });
         });

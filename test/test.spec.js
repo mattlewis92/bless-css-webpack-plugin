@@ -175,7 +175,6 @@ it('should support sourcemaps', done => {
 });
 
 it('should support adding import rules', done => {
-
   Promise.all([
     readFile(path.join(__dirname, 'fixtures/expected/add-imports/main.css')),
     readFile(path.join(__dirname, 'fixtures/expected/add-imports/main-blessed1.css'))
@@ -214,7 +213,6 @@ it('should support adding import rules', done => {
         done();
       }
     });
-
   }).catch(done);
 });
 
