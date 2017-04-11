@@ -15,7 +15,7 @@ function createBlessedFileName(filenameWithoutExtension, index) {
  * Inject @import rules into a .css file for all others
  */
 function addImports(parsedData, filenameWithoutExtension) {
-  const sourceToInjectIndex = parsedData.data.length - 1;
+  const sourceToInjectIndex = 0;
   let addImports = '';
 
   parsedData.data.map((fileContents, index) => { // eslint-disable-line max-nested-callbacks
