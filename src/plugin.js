@@ -7,20 +7,21 @@ const RawSource = webpackSources.RawSource;
 const SourceMapSource = webpackSources.SourceMapSource;
 const CSS_REGEXP = /\.css$/;
 
-function createBlessedFileName(filenameWithoutExtension, index) {
-  return index === 0 ? `${filenameWithoutExtension}.css` : `${filenameWithoutExtension}-blessed${index}.css`;
+function createBlessedFileName(filenameWithoutExtension, index, numFiles) {
+  return index === numFiles - 1 ? `${filenameWithoutExtension}.css` : `${filenameWithoutExtension}-blessed${index}.css`;
 }
 
 /**
  * Inject @import rules into a .css file for all others
  */
 function addImports(parsedData, filenameWithoutExtension) {
-  const sourceToInjectIndex = parsedData.data.length - 1;
+  let numFiles = parsedData.data.length;
+  const sourceToInjectIndex = numFiles - 1;
   let addImports = '';
 
   parsedData.data.map((fileContents, index) => { // eslint-disable-line max-nested-callbacks
     if (index !== sourceToInjectIndex) {
-      const filename = createBlessedFileName(filenameWithoutExtension, index);
+      const filename = createBlessedFileName(filenameWithoutExtension, index, numFiles);
       // E.g. @import url(app-blessed1.css);
       addImports += `@import url(${filename});\n`;
     }
@@ -76,8 +77,9 @@ class BlessCSSWebpackPlugin {
                   parsedData = addImports(parsedData, filenameWithoutExtension);
                 }
 
+                let numFiles = parsedData.data.length;
                 parsedData.data.forEach((fileContents, index) => { // eslint-disable-line max-nested-callbacks
-                  const filename = createBlessedFileName(filenameWithoutExtension, index);
+                  const filename = createBlessedFileName(filenameWithoutExtension, index, numFiles);
                   const outputSourceMap = parsedData.maps[index];
 
                   if (outputSourceMap) {
@@ -86,14 +88,10 @@ class BlessCSSWebpackPlugin {
                     compilation.assets[filename] = new RawSource(fileContents);
                   }
 
-                  if ((index > 0 && !this.options.addImports) || (index === parsedData.data.length - 1 && this.options.addImports)) {
+                  if (index < numFiles - 1 && !this.options.addImports) {
                     chunk.files.push(filename);
                   }
                 });
-
-                if (this.options.addImports) {
-                  chunk.files = chunk.files.filter(file => file !== cssFileName); // eslint-disable-line max-nested-callbacks
-                }
               }
             });
         });
