@@ -15,7 +15,10 @@ function createBlessedFileName(filenameWithoutExtension, index) {
  * Inject @import rules into a .css file for all others
  */
 function addImports(parsedData, filenameWithoutExtension) {
-  const sourceToInjectIndex = parsedData.data.length - 1;
+  const lastChunk = parsedData.data.pop();
+  parsedData.data = [lastChunk].concat(parsedData.data);
+
+  const sourceToInjectIndex = 0;
   let addImports = '';
 
   parsedData.data.map((fileContents, index) => { // eslint-disable-line max-nested-callbacks
@@ -86,14 +89,10 @@ class BlessCSSWebpackPlugin {
                     compilation.assets[filename] = new RawSource(fileContents);
                   }
 
-                  if ((index > 0 && !this.options.addImports) || (index === parsedData.data.length - 1 && this.options.addImports)) {
+                  if (index > 0 && !this.options.addImports) {
                     chunk.files.push(filename);
                   }
                 });
-
-                if (this.options.addImports) {
-                  chunk.files = chunk.files.filter(file => file !== cssFileName); // eslint-disable-line max-nested-callbacks
-                }
               }
             });
         });
